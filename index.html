@@ -111,6 +111,7 @@
     border-radius: 10px;
   }
   .topbar .logout:active { background: #e5e7eb; }
+  .topbar-actions { display: flex; align-items: center; gap: 8px; }
 
   .category-area {
     flex: 1 1 auto;
@@ -449,6 +450,82 @@
     padding: 0 20px 20px;
   }
 
+  /* ============ 总账本 ============ */
+  .ledger-summary {
+    flex-shrink: 0;
+    display: flex;
+    gap: 12px;
+    padding: 8px 20px 16px;
+  }
+  .ledger-stat {
+    flex: 1;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+  }
+  .ledger-stat .ls-value { font-size: 24px; font-weight: 800; color: var(--primary); word-break: break-all; }
+  .ledger-stat .ls-label { font-size: 12px; color: var(--text-2); margin-top: 4px; }
+  .ledger-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0 20px 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ledger-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .ledger-item:last-child { border-bottom: none; }
+  .li-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .li-seq {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+    background: rgba(16, 185, 129, .12);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .li-time { flex: 1 1 auto; font-size: 13px; color: var(--text-2); }
+  .li-amount { font-size: 15px; font-weight: 700; color: var(--primary); }
+  .li-dishes {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.4;
+    word-break: break-all;
+  }
+  .ledger-empty {
+    text-align: center;
+    color: var(--text-3);
+    font-size: 14px;
+    padding: 24px 0;
+  }
+  .ledger-footer {
+    flex-shrink: 0;
+    padding: 0 20px 20px;
+  }
+  .ledger-clear-btn {
+    width: 100%;
+    height: 44px;
+    background: #fef2f2;
+    color: var(--danger);
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: background .15s, color .15s;
+  }
+  .ledger-clear-btn:active { background: #fee2e2; }
+  .ledger-clear-btn.confirming {
+    background: var(--danger);
+    color: #fff;
+  }
+
   /* ============ 菜品弹窗 ============ */
   .modal-mask {
     position: fixed;
@@ -583,7 +660,10 @@
   <section id="mainView" class="hidden">
     <header class="topbar">
       <h1>📋 点单台</h1>
-      <button id="logoutBtn" class="logout">退出登录</button>
+      <div class="topbar-actions">
+        <button id="ledgerBtn" class="logout">账本</button>
+        <button id="logoutBtn" class="logout">退出登录</button>
+      </div>
     </header>
     <div id="categoryArea" class="category-area"></div>
 
@@ -655,6 +735,30 @@
     </div>
   </div>
 
+  <!-- 总账本弹窗 -->
+  <div id="ledgerModal" class="modal-mask hidden">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h3 id="ledgerTitle">总账本</h3>
+        <button id="ledgerClose" class="modal-close">✕</button>
+      </div>
+      <div class="ledger-summary">
+        <div class="ledger-stat">
+          <div class="ls-value" id="ledgerCount">0</div>
+          <div class="ls-label">今日单数</div>
+        </div>
+        <div class="ledger-stat">
+          <div class="ls-value" id="ledgerAmount">¥0.00</div>
+          <div class="ls-label">今日金额</div>
+        </div>
+      </div>
+      <div id="ledgerList" class="ledger-list"></div>
+      <div class="ledger-footer">
+        <button id="ledgerClear" class="ledger-clear-btn">清除今日数据</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="hidden"></div>
 
 <script>
@@ -703,52 +807,12 @@
         { name: '鲜肉云吞', price: 16 },
         { name: '汤濑粉', price: 16 },
         { name: '牛腩汤粉', price: 25 },
+        { name: '牛杂', price: 25 },
+        { name: '牛杂面', price: 25 },
+        { name: '牛腩面', price: 25 },
       ],
       remarkGroups: [
         { title: '备注', options: ['不要葱花'] },
-      ],
-    },
-    {
-      category: '烧烤系列',
-      icon: '🍢',
-      items: [
-        { name: '生蚝（一打）', price: 88, desc: '每打' },
-        { name: '生蚝（半打）', price: 48, desc: '每半打' },
-        { name: '大油边', price: 15, desc: '每串' },
-        { name: '牛油', price: 15, desc: '每把' },
-        { name: '干鱿鱼', price: 18, desc: '每串' },
-        { name: '全翅', price: 12, desc: '每串' },
-        { name: '安格斯牛肋条', price: 10, desc: '每串' },
-        { name: '鸡中翅', price: 10, desc: '每串' },
-        { name: '鸡脚', price: 10, desc: '每串' },
-        { name: '雪花牛肉粒', price: 8, desc: '每串' },
-        { name: '五花趾牛肉', price: 6, desc: '每串' },
-        { name: '黑椒牛肉', price: 25, desc: '每把' },
-        { name: '嫩牛肉', price: 4, desc: '每串' },
-        { name: '五花肉', price: 4, desc: '每串' },
-        { name: '掌中宝', price: 4, desc: '每串' },
-        { name: '热狗肠', price: 4, desc: '每串' },
-        { name: '蚂蚱', price: 4, desc: '每串' },
-        { name: '韭菜', price: 4, desc: '每串' },
-        { name: '娃娃菜', price: 4, desc: '每串' },
-        { name: '西葫芦', price: 4, desc: '每串' },
-        { name: '四季豆', price: 4, desc: '每串' },
-        { name: '蒜蓉香菇', price: 4, desc: '每串' },
-        { name: '蒜蓉茄子', price: 12, desc: '每份' },
-      ],
-    },
-    {
-      category: '小吃系列',
-      icon: '🍟',
-      items: [
-        { name: '鸡米花', price: 20 },
-        { name: '原味小酥肉', price: 28 },
-        { name: '韩式炸鸡', price: 28 },
-        { name: '鸡肉洋葱圈', price: 20 },
-        { name: '原味盐酥鸡', price: 20 },
-        { name: '小吃四拼盘', price: 28 },
-        { name: '炸薯条', price: 20 },
-        { name: '黄金地瓜条', price: 18 },
       ],
     },
     {
@@ -861,16 +925,61 @@
         },
       ],
     },
+    {
+      category: '小吃系列',
+      icon: '🍟',
+      items: [
+        { name: '鸡米花', price: 20 },
+        { name: '原味小酥肉', price: 28 },
+        { name: '韩式炸鸡', price: 28 },
+        { name: '鸡肉洋葱圈', price: 20 },
+        { name: '原味盐酥鸡', price: 20 },
+        { name: '小吃四拼盘', price: 28 },
+        { name: '炸薯条', price: 20 },
+        { name: '黄金地瓜条', price: 18 },
+      ],
+    },
+    {
+      category: '烧烤系列',
+      icon: '🍢',
+      items: [
+        { name: '生蚝（一打）', price: 88, desc: '每打' },
+        { name: '生蚝（半打）', price: 48, desc: '每半打' },
+        { name: '大油边', price: 15, desc: '每串' },
+        { name: '牛油', price: 15, desc: '每把' },
+        { name: '干鱿鱼', price: 18, desc: '每串' },
+        { name: '全翅', price: 12, desc: '每串' },
+        { name: '安格斯牛肋条', price: 10, desc: '每串' },
+        { name: '鸡中翅', price: 10, desc: '每串' },
+        { name: '鸡脚', price: 10, desc: '每串' },
+        { name: '雪花牛肉粒', price: 8, desc: '每串' },
+        { name: '五花趾牛肉', price: 6, desc: '每串' },
+        { name: '黑椒牛肉', price: 25, desc: '每把' },
+        { name: '嫩牛肉', price: 4, desc: '每串' },
+        { name: '五花肉', price: 4, desc: '每串' },
+        { name: '掌中宝', price: 4, desc: '每串' },
+        { name: '热狗肠', price: 4, desc: '每串' },
+        { name: '蚂蚱', price: 4, desc: '每串' },
+        { name: '韭菜', price: 4, desc: '每串' },
+        { name: '娃娃菜', price: 4, desc: '每串' },
+        { name: '西葫芦', price: 4, desc: '每串' },
+        { name: '四季豆', price: 4, desc: '每串' },
+        { name: '蒜蓉香菇', price: 4, desc: '每串' },
+        { name: '蒜蓉茄子', price: 12, desc: '每份' },
+      ],
+    },
   ];
 
   const STORAGE_KEY = 'order_taker_orders_v2';
   const SEQ_KEY = 'order_taker_seq_v2';
   const PENDING_KEY = 'order_taker_pending_v2';
+  const SALES_KEY = 'order_taker_sales_v2';
 
   /* ============ 状态 ============ */
-  let pending = []; // 待确定菜品：{ id, name, price }
-  let orders = [];  // 已下单：{ id, seq, dishes:[{name,price}], time, total }
+  let pending = []; // 待确定菜品：{ id, name, price, remarks }
+  let orders = [];  // 已下单：{ id, seq, dishes:[{name,price,remarks}], time, total }
   let nextSeq = 1;  // 下一个订单号
+  let salesLog = []; // 销售记录：{ seq, amount, time }
 
   /* ============ DOM ============ */
   const $ = (id) => document.getElementById(id);
@@ -908,9 +1017,18 @@
   const remarkBody = $('remarkBody');
   const remarkClose = $('remarkClose');
   const remarkConfirm = $('remarkConfirm');
+  const ledgerBtn = $('ledgerBtn');
+  const ledgerModal = $('ledgerModal');
+  const ledgerTitle = $('ledgerTitle');
+  const ledgerCount = $('ledgerCount');
+  const ledgerAmount = $('ledgerAmount');
+  const ledgerList = $('ledgerList');
+  const ledgerClose = $('ledgerClose');
+  const ledgerClear = $('ledgerClear');
   const toast = $('toast');
 
   let toastTimer = null;
+  let ledgerClearTimer = null; // 清除账本二次确认定时器
   let remarkTargetDish = null; // 当前要加备注的菜品
   let remarkSelection = {};    // { 组标题: [已选项] }
   let currentDetailOrderId = null; // 当前详情弹窗的订单 id
@@ -1137,10 +1255,12 @@
     if (!dish) return;
     o.dishes.splice(dishIndex, 1);
     if (o.dishes.length === 0) {
-      // 整单菜品都出完：删除订单并释放单号
+      // 整单菜品都出完：删除订单并释放单号、记录销售
       const oi = orders.indexOf(o);
       orders.splice(oi, 1);
       nextSeq = o.seq;
+      const dishes = o.origDishes || o.dishes;
+      recordSale(o.seq, o.origTotal != null ? o.origTotal : o.total, dishes);
       saveAll();
       renderOrders();
       closeOrderDetail();
@@ -1213,12 +1333,15 @@
     }
     const total = pending.reduce((s, p) => s + p.price, 0);
     const seq = nextSeq;
+    const dishArr = pending.map((p) => ({ name: p.name, price: p.price, remarks: p.remarks || [] }));
     orders.push({
       id: Date.now() + '-' + Math.random().toString(36).slice(2, 8),
       seq: seq,
-      dishes: pending.map((p) => ({ name: p.name, price: p.price, remarks: p.remarks || [] })),
+      dishes: dishArr,
+      origDishes: dishArr.slice(), // 整单完整菜品快照，账本记账用
       time: Date.now(),
       total: total,
+      origTotal: total, // 整单完整总价，账本记账用
     });
     nextSeq += 1;
     // 最新下单的排最底下
@@ -1259,10 +1382,25 @@
     const served = orders[idx];
     // 下一个订单号复用刚出餐这单的订单号
     nextSeq = served.seq;
+    const dishes = served.origDishes || served.dishes;
+    recordSale(served.seq, served.origTotal != null ? served.origTotal : served.total, dishes);
     orders.splice(idx, 1);
     saveAll();
     renderOrders();
     showToast('已出餐 #' + served.seq);
+  }
+
+  // 记录一笔销售（订单完全出餐时调用），dishes 为该单完整菜品列表
+  function recordSale(seq, amount, dishes) {
+    salesLog.push({
+      seq: seq,
+      amount: amount,
+      time: Date.now(),
+      items: (dishes || []).map((d) => ({ name: d.name, remarks: d.remarks || [] })),
+    });
+    try {
+      localStorage.setItem(SALES_KEY, JSON.stringify(salesLog));
+    } catch (e) { /* 忽略 */ }
   }
 
   function formatTime(ts) {
@@ -1321,11 +1459,21 @@
     } catch (e) { orders = []; }
     if (!Array.isArray(orders)) orders = [];
     orders.sort((a, b) => a.time - b.time);
+    // 兼容旧数据：补齐 origTotal、origDishes
+    orders.forEach((o) => {
+      if (typeof o.origTotal !== 'number') o.origTotal = o.total;
+      if (!Array.isArray(o.origDishes)) o.origDishes = Array.isArray(o.dishes) ? o.dishes.slice() : [];
+    });
 
     try {
       pending = JSON.parse(localStorage.getItem(PENDING_KEY)) || [];
     } catch (e) { pending = []; }
     if (!Array.isArray(pending)) pending = [];
+
+    try {
+      salesLog = JSON.parse(localStorage.getItem(SALES_KEY)) || [];
+    } catch (e) { salesLog = []; }
+    if (!Array.isArray(salesLog)) salesLog = [];
 
     nextSeq = 1;
     try {
@@ -1349,8 +1497,89 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
       localStorage.setItem(SEQ_KEY, String(nextSeq));
       localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+      localStorage.setItem(SALES_KEY, JSON.stringify(salesLog));
     } catch (e) { /* 忽略 */ }
   }
+
+  /* ============ 总账本 ============ */
+  function isToday(ts) {
+    const d = new Date(ts);
+    const n = new Date();
+    return d.getFullYear() === n.getFullYear() &&
+           d.getMonth() === n.getMonth() &&
+           d.getDate() === n.getDate();
+  }
+
+  function openLedger() {
+    const today = salesLog.filter((s) => isToday(s.time));
+    const total = today.reduce((sum, s) => sum + s.amount, 0);
+    const n = new Date();
+    ledgerTitle.textContent = '总账本 · ' + (n.getMonth() + 1) + '月' + n.getDate() + '日';
+    ledgerCount.textContent = today.length;
+    ledgerAmount.textContent = '¥' + total.toFixed(2);
+    ledgerList.innerHTML = '';
+    if (today.length === 0) {
+      ledgerList.innerHTML = '<div class="ledger-empty">今日暂无出餐记录</div>';
+    } else {
+      today.forEach((s) => {
+        const row = document.createElement('div');
+        row.className = 'ledger-item';
+        const items = (s.items || []).map((it) =>
+          it.name + (it.remarks && it.remarks.length ? '（' + it.remarks.join('、') + '）' : '')
+        ).join('、');
+        row.innerHTML =
+          '<div class="li-head">' +
+            '<span class="li-seq">#' + s.seq + '</span>' +
+            '<span class="li-time">' + formatTime(s.time) + '</span>' +
+            '<span class="li-amount">¥' + s.amount.toFixed(2) + '</span>' +
+          '</div>' +
+          '<div class="li-dishes">' + items + '</div>';
+        ledgerList.appendChild(row);
+      });
+    }
+    ledgerModal.classList.remove('hidden');
+  }
+
+  function closeLedger() {
+    ledgerModal.classList.add('hidden');
+    resetLedgerClearBtn();
+  }
+  ledgerBtn.addEventListener('click', openLedger);
+  ledgerClose.addEventListener('click', closeLedger);
+  ledgerModal.addEventListener('click', (e) => {
+    if (e.target === ledgerModal) closeLedger();
+  });
+
+  // 清除今日账本（两步确认，防止误触）
+  function resetLedgerClearBtn() {
+    clearTimeout(ledgerClearTimer);
+    ledgerClearTimer = null;
+    ledgerClear.classList.remove('confirming');
+    ledgerClear.textContent = '清除今日数据';
+  }
+
+  ledgerClear.addEventListener('click', () => {
+    const today = salesLog.filter((s) => isToday(s.time));
+    if (today.length === 0) {
+      showToast('今日暂无数据可清除');
+      return;
+    }
+    if (ledgerClear.classList.contains('confirming')) {
+      // 二次确认：执行清除
+      salesLog = salesLog.filter((s) => !isToday(s.time));
+      try {
+        localStorage.setItem(SALES_KEY, JSON.stringify(salesLog));
+      } catch (e) { /* 忽略 */ }
+      resetLedgerClearBtn();
+      openLedger();
+      showToast('已清除今日账本');
+    } else {
+      // 第一次点击：进入确认态
+      ledgerClear.classList.add('confirming');
+      ledgerClear.textContent = '再次点击确认清除';
+      ledgerClearTimer = setTimeout(resetLedgerClearBtn, 3000);
+    }
+  });
 
   /* ============ 轻提示 ============ */
   function showToast(msg) {
