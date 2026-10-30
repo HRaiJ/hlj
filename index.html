@@ -122,7 +122,7 @@
   }
   .category-card {
     flex: 1 1 0;
-    min-height: 96px;
+    min-height: 90px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -146,6 +146,84 @@
     border-radius: 20px;
     align-self: flex-start;
   }
+
+  /* ============ 待确定订单 ============ */
+  .pending-panel {
+    flex-shrink: 0;
+    max-height: 42%;
+    display: flex;
+    flex-direction: column;
+    background: var(--card);
+    border-top: 1px solid var(--line);
+  }
+  .pending-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 8px;
+  }
+  .pending-head h2 { font-size: 15px; font-weight: 700; }
+  .pending-clear {
+    font-size: 13px;
+    color: var(--text-2);
+    background: #f1f2f4;
+    padding: 6px 12px;
+    border-radius: 8px;
+  }
+  .pending-clear:active { background: #e5e7eb; }
+  .pending-list {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 0 14px 10px;
+    overflow-y: auto;
+    align-content: start;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pending-item {
+    position: relative;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .pending-item .pi-name { font-size: 13px; font-weight: 600; line-height: 1.3; word-break: break-all; }
+  .pending-item .pi-remark {
+    font-size: 11px;
+    color: var(--primary);
+    margin-top: 4px;
+    line-height: 1.3;
+    word-break: break-all;
+  }
+  .pending-item .pi-price { font-size: 13px; font-weight: 700; color: #f59e0b; margin-top: 4px; }
+  .pending-item .pi-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    font-size: 13px;
+    line-height: 20px;
+  }
+  .pending-item .pi-remove:active { background: #fecaca; }
+  .pending-footer { flex-shrink: 0; padding: 0 14px 14px; }
+  .confirm-btn {
+    width: 100%;
+    height: 48px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 12px;
+    transition: background .15s, transform .05s;
+  }
+  .confirm-btn:active { background: var(--primary-dark); transform: scale(.98); }
 
   /* ============ 订单列表 ============ */
   .order-panel {
@@ -220,42 +298,156 @@
   .order-item {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 12px 10px;
     background: #f8fafc;
     border: 1px solid var(--line);
-    border-radius: 14px;
+    border-radius: 12px;
+    padding: 10px;
+    cursor: pointer;
   }
-  .order-info { min-width: 0; }
-  .order-info .oi-seq {
-    display: inline-block;
-    font-size: 12px;
+  .order-item:active { background: #f1f5f9; }
+  .oi-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .oi-seq {
+    font-size: 13px;
     font-weight: 700;
     color: var(--primary);
     background: rgba(16, 185, 129, .12);
     padding: 2px 8px;
-    border-radius: 8px;
-    margin-bottom: 5px;
+    border-radius: 6px;
   }
-  .order-info .oi-name {
-    font-size: 14px;
-    font-weight: 600;
-    line-height: 1.3;
+  .oi-time { font-size: 11px; color: var(--text-3); }
+  .oi-dish-list {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .oi-dish { font-size: 12px; line-height: 1.3; color: var(--text-2); }
+  .oi-dish-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .oi-remark {
+    font-size: 10px;
+    color: var(--primary);
+    margin-top: 1px;
     word-break: break-all;
   }
-  .order-info .oi-meta { font-size: 11px; color: var(--text-3); margin-top: 3px; }
-  .order-info .oi-price { font-size: 15px; font-weight: 700; color: var(--primary); margin-top: 3px; }
+  .oi-more { font-size: 11px; color: var(--primary); font-weight: 600; }
+  .oi-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--line);
+  }
+  .oi-total { font-size: 14px; font-weight: 700; color: var(--primary); }
   .serve-btn {
-    width: 100%;
-    height: 36px;
+    height: 30px;
+    padding: 0 12px;
     background: var(--primary);
     color: #fff;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    border-radius: 10px;
+    border-radius: 8px;
     transition: background .15s, transform .05s;
   }
   .serve-btn:active { background: var(--primary-dark); transform: scale(.96); }
+
+  /* ============ 订单详情弹窗 ============ */
+  .detail-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 4px 20px 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .detail-dish {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .detail-dish:last-child { border-bottom: none; }
+  .dd-left { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .detail-dish .dd-name { font-size: 15px; font-weight: 600; }
+  .detail-dish .dd-remark { font-size: 12px; color: var(--primary); }
+  .dd-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .detail-dish .dd-price { font-size: 14px; font-weight: 700; color: #f59e0b; }
+  .dd-serve {
+    height: 32px;
+    padding: 0 14px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background .15s, transform .05s;
+  }
+  .dd-serve:active { background: var(--primary-dark); transform: scale(.96); }
+  .detail-foot {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 20px;
+    border-top: 1px solid var(--line);
+  }
+  .detail-foot .df-total { font-size: 16px; font-weight: 700; color: var(--primary); }
+  .detail-serve-btn {
+    height: 44px;
+    padding: 0 24px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+  }
+  .detail-serve-btn:active { background: var(--primary-dark); }
+
+  /* ============ 备注选择弹窗 ============ */
+  .remark-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 4px 20px 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .remark-group { margin-top: 16px; }
+  .remark-group:first-child { margin-top: 4px; }
+  .remark-group-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-2);
+    margin-bottom: 10px;
+  }
+  .remark-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .chip {
+    height: 38px;
+    padding: 0 16px;
+    background: #f1f2f4;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 20px;
+    transition: background .12s, color .12s;
+  }
+  .chip:active { background: #e5e7eb; }
+  .chip.active {
+    background: rgba(16, 185, 129, .14);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .remark-footer {
+    flex-shrink: 0;
+    padding: 0 20px 20px;
+  }
 
   /* ============ 菜品弹窗 ============ */
   .modal-mask {
@@ -303,6 +495,15 @@
     align-content: start;
     -webkit-overflow-scrolling: touch;
   }
+  .group-head {
+    grid-column: 1 / -1;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-2);
+    margin-top: 8px;
+    padding: 6px 0 2px;
+    border-bottom: 1px solid var(--line);
+  }
   .dish-item {
     display: flex;
     flex-direction: column;
@@ -345,7 +546,7 @@
   #toast {
     position: fixed;
     left: 50%;
-    bottom: 90px;
+    bottom: 100px;
     transform: translateX(-50%);
     background: rgba(15, 23, 42, 0.85);
     color: #fff;
@@ -387,6 +588,20 @@
     <div id="categoryArea" class="category-area"></div>
 
     <div id="orderMask" class="order-mask hidden"></div>
+
+    <!-- 待确定订单 -->
+    <div id="pendingPanel" class="pending-panel hidden">
+      <div class="pending-head">
+        <h2>🛒 待确定订单</h2>
+        <button id="pendingClear" class="pending-clear">清空</button>
+      </div>
+      <div id="pendingList" class="pending-list"></div>
+      <div class="pending-footer">
+        <button id="confirmBtn" class="confirm-btn">确定下单</button>
+      </div>
+    </div>
+
+    <!-- 订单列表 -->
     <div class="order-panel" id="orderPanel">
       <button id="collapseBtn" class="collapse-btn hidden">▾ 收起</button>
       <div class="order-head" id="orderHead">
@@ -411,6 +626,35 @@
     </div>
   </div>
 
+  <!-- 订单详情弹窗 -->
+  <div id="orderDetailModal" class="modal-mask hidden">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h3 id="orderDetailTitle"></h3>
+        <button id="orderDetailClose" class="modal-close">✕</button>
+      </div>
+      <div id="orderDetailBody" class="detail-body"></div>
+      <div class="detail-foot">
+        <span id="orderDetailTotal" class="df-total"></span>
+        <button id="orderDetailServe" class="detail-serve-btn">全部出餐</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 备注选择弹窗 -->
+  <div id="remarkModal" class="modal-mask hidden">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h3 id="remarkTitle"></h3>
+        <button id="remarkClose" class="modal-close">✕</button>
+      </div>
+      <div id="remarkBody" class="remark-body"></div>
+      <div class="remark-footer">
+        <button id="remarkConfirm" class="confirm-btn">确定加入</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="hidden"></div>
 
 <script>
@@ -421,49 +665,212 @@
   const ACCOUNT = 'hlj';
   const PASSWORD = '0512';
 
-  // 菜品数据：category 为分类名，items 为该分类下的菜品
+  // 菜品数据：category 为分类名，items 为该分类下的菜品；饮品用 groups 按子系列分组
   const MENU = [
+    {
+      category: '炒粉系列',
+      icon: '🍝',
+      items: [
+        { name: '炒米粉（小份）', price: 15 },
+        { name: '炒米粉（中份）', price: 18 },
+        { name: '炒米粉（大份）', price: 25 },
+        { name: '炒河粉（小份）', price: 15 },
+        { name: '炒河粉（中份）', price: 18 },
+        { name: '炒河粉（大份）', price: 25 },
+        { name: '炒濑粉（小份）', price: 15 },
+        { name: '炒濑粉（中份）', price: 18 },
+        { name: '炒濑粉（大份）', price: 25 },
+        { name: '炒面（小份）', price: 15 },
+        { name: '炒面（中份）', price: 18 },
+        { name: '炒面（大份）', price: 25 },
+        { name: '炒饭（小份）', price: 15 },
+        { name: '炒饭（中份）', price: 18 },
+        { name: '炒饭（大份）', price: 25 },
+        { name: '炒牛河', price: 25 },
+        { name: '鸡蛋瘦肉肠粉', price: 10 },
+      ],
+      remarkGroups: [
+        { title: '口味备注', options: ['少油', '少盐', '辣', '中辣', '微辣', '不要胡萝卜', '不要葱花', '不要香菜'] },
+      ],
+    },
+    {
+      category: '汤粉系列',
+      icon: '🍜',
+      items: [
+        { name: '猪杂汤粉', price: 15 },
+        { name: '汤米粉', price: 15 },
+        { name: '汤面', price: 15 },
+        { name: '鲜肉云吞', price: 16 },
+        { name: '汤濑粉', price: 16 },
+        { name: '牛腩汤粉', price: 25 },
+      ],
+      remarkGroups: [
+        { title: '备注', options: ['不要葱花'] },
+      ],
+    },
+    {
+      category: '烧烤系列',
+      icon: '🍢',
+      items: [
+        { name: '生蚝（一打）', price: 88, desc: '每打' },
+        { name: '生蚝（半打）', price: 48, desc: '每半打' },
+        { name: '大油边', price: 15, desc: '每串' },
+        { name: '牛油', price: 15, desc: '每把' },
+        { name: '干鱿鱼', price: 18, desc: '每串' },
+        { name: '全翅', price: 12, desc: '每串' },
+        { name: '安格斯牛肋条', price: 10, desc: '每串' },
+        { name: '鸡中翅', price: 10, desc: '每串' },
+        { name: '鸡脚', price: 10, desc: '每串' },
+        { name: '雪花牛肉粒', price: 8, desc: '每串' },
+        { name: '五花趾牛肉', price: 6, desc: '每串' },
+        { name: '黑椒牛肉', price: 25, desc: '每把' },
+        { name: '嫩牛肉', price: 4, desc: '每串' },
+        { name: '五花肉', price: 4, desc: '每串' },
+        { name: '掌中宝', price: 4, desc: '每串' },
+        { name: '热狗肠', price: 4, desc: '每串' },
+        { name: '蚂蚱', price: 4, desc: '每串' },
+        { name: '韭菜', price: 4, desc: '每串' },
+        { name: '娃娃菜', price: 4, desc: '每串' },
+        { name: '西葫芦', price: 4, desc: '每串' },
+        { name: '四季豆', price: 4, desc: '每串' },
+        { name: '蒜蓉香菇', price: 4, desc: '每串' },
+        { name: '蒜蓉茄子', price: 12, desc: '每份' },
+      ],
+    },
+    {
+      category: '小吃系列',
+      icon: '🍟',
+      items: [
+        { name: '鸡米花', price: 20 },
+        { name: '原味小酥肉', price: 28 },
+        { name: '韩式炸鸡', price: 28 },
+        { name: '鸡肉洋葱圈', price: 20 },
+        { name: '原味盐酥鸡', price: 20 },
+        { name: '小吃四拼盘', price: 28 },
+        { name: '炸薯条', price: 20 },
+        { name: '黄金地瓜条', price: 18 },
+      ],
+    },
     {
       category: '饮品',
       icon: '🧋',
-      items: [
-        { name: '冰镇柠檬茶', price: 8,  desc: '清爽解腻' },
-        { name: '港式奶茶',   price: 12, desc: '香浓丝滑' },
-        { name: '鲜榨橙汁',   price: 15, desc: '现榨无添加' },
-        { name: '冰美式咖啡', price: 10, desc: '提神醒脑' },
-        { name: '青柠气泡水', price: 9,  desc: '酸甜气泡' },
+      remarkGroups: [
+        { title: '糖度', options: ['3分糖', '5分糖', '7分糖', '正常糖'], single: true },
+        { title: '冰量', options: ['少冰', '去冰'], single: true },
       ],
-    },
-    {
-      category: '锅炒',
-      icon: '🍳',
-      items: [
-        { name: '农家小炒肉', price: 28, desc: '香辣下饭' },
-        { name: '番茄炒蛋',   price: 18, desc: '家常经典' },
-        { name: '干煸四季豆', price: 20, desc: '干香爽脆' },
-        { name: '宫保鸡丁',   price: 26, desc: '酸甜微辣' },
-        { name: '蒜蓉空心菜', price: 16, desc: '清爽时蔬' },
-      ],
-    },
-    {
-      category: '汤粉',
-      icon: '🍜',
-      items: [
-        { name: '牛肉汤粉', price: 22, desc: '原汤炖牛肉' },
-        { name: '猪杂汤粉', price: 18, desc: '料足汤鲜' },
-        { name: '酸辣粉',   price: 14, desc: '酸辣开胃' },
-        { name: '海鲜汤粉', price: 25, desc: '鲜虾贝类' },
-        { name: '桂林米粉', price: 16, desc: '地道风味' },
+      groups: [
+        {
+          name: '柠檬茶系列',
+          items: [
+            { name: '手打柠檬红茶', price: 15 },
+            { name: '手打柠檬绿茶', price: 15 },
+            { name: '鸭屎香柠檬茶', price: 15 },
+            { name: '泰式柠檬茶', price: 15 },
+            { name: '金桔柠檬茶', price: 15 },
+            { name: '话梅柠檬茶', price: 16 },
+            { name: '百香果柠檬茶', price: 16 },
+            { name: '香橙柠檬茶', price: 16 },
+            { name: '西瓜柠檬茶', price: 16 },
+            { name: '黑加仑柠檬茶', price: 16 },
+            { name: '霸王水果茶', price: 16 },
+            { name: '香橙百香果柠檬茶', price: 16 },
+          ],
+        },
+        {
+          name: '益力多系列',
+          items: [
+            { name: '柠檬多多', price: 18 },
+            { name: '香橙多多', price: 18 },
+            { name: '芒果多多', price: 18 },
+            { name: '草莓多多', price: 18 },
+            { name: '西瓜多多', price: 18 },
+            { name: '百香果多多', price: 18 },
+            { name: '黑加仑多多', price: 18 },
+            { name: '香橙百香果多多', price: 18 },
+          ],
+        },
+        {
+          name: '果汁系列',
+          items: [
+            { name: '椰子汁', price: 15 },
+            { name: '西瓜汁', price: 16 },
+            { name: '芒果汁', price: 18 },
+            { name: '草莓奶昔', price: 18 },
+          ],
+        },
+        {
+          name: '冰沙系列',
+          items: [
+            { name: '芒果冰沙', price: 18 },
+            { name: '西瓜冰沙', price: 18 },
+          ],
+        },
+        {
+          name: '奶茶系列',
+          items: [
+            { name: '原味奶茶', price: 15 },
+            { name: '椰果奶茶', price: 15 },
+            { name: '黑砖奶茶', price: 15 },
+            { name: '鸭屎香奶茶', price: 15 },
+            { name: '波波奶绿', price: 16 },
+            { name: '茉莉奶绿', price: 16 },
+            { name: '脆波波奶茶', price: 16 },
+            { name: '抹茶啵啵奶茶', price: 16 },
+            { name: '啵啵芋泥烤奶', price: 18 },
+            { name: '红糖姜枣牛乳茶', price: 18 },
+          ],
+        },
+        {
+          name: '牛奶系列',
+          items: [
+            { name: '鲜牛奶', price: 15 },
+            { name: '巧克力牛奶', price: 18 },
+            { name: '草莓牛奶', price: 18 },
+            { name: '抹茶牛奶', price: 18 },
+            { name: '莓莓抹茶牛乳', price: 20 },
+            { name: '鸭屎香冰椰奶', price: 18 },
+          ],
+        },
+        {
+          name: '苏打系列',
+          items: [
+            { name: '柠檬苏打', price: 15 },
+            { name: '香橙苏打', price: 15 },
+            { name: '百香果苏打', price: 15 },
+            { name: '黑加仑苏打', price: 15 },
+            { name: '草莓苏打', price: 16 },
+            { name: '益力多苏打', price: 16 },
+            { name: '话梅柠檬苏打', price: 16 },
+          ],
+        },
+        {
+          name: '椰椰系列',
+          items: [
+            { name: '芒果椰椰', price: 18 },
+            { name: '西瓜椰椰', price: 18 },
+            { name: '草莓椰椰', price: 18 },
+            { name: '抹茶椰椰', price: 18 },
+          ],
+        },
+        {
+          name: '轻乳茶系列',
+          items: [
+            { name: '鸭屎清乳', price: 18 },
+            { name: '茉莉初露', price: 18 },
+          ],
+        },
       ],
     },
   ];
 
-  const STORAGE_KEY = 'order_taker_orders';
-  const SEQ_KEY = 'order_taker_seq';
+  const STORAGE_KEY = 'order_taker_orders_v2';
+  const SEQ_KEY = 'order_taker_seq_v2';
+  const PENDING_KEY = 'order_taker_pending_v2';
 
   /* ============ 状态 ============ */
-  let orders = []; // { id, name, price, time }
-  let seqCounter = 0; // 订单号计数器
+  let pending = []; // 待确定菜品：{ id, name, price }
+  let orders = [];  // 已下单：{ id, seq, dishes:[{name,price}], time, total }
+  let nextSeq = 1;  // 下一个订单号
 
   /* ============ DOM ============ */
   const $ = (id) => document.getElementById(id);
@@ -475,6 +882,10 @@
   const loginBtn = $('loginBtn');
   const logoutBtn = $('logoutBtn');
   const categoryArea = $('categoryArea');
+  const pendingPanel = $('pendingPanel');
+  const pendingList = $('pendingList');
+  const pendingClear = $('pendingClear');
+  const confirmBtn = $('confirmBtn');
   const orderPanel = $('orderPanel');
   const orderHead = $('orderHead');
   const orderMask = $('orderMask');
@@ -486,9 +897,23 @@
   const modalTitle = $('modalTitle');
   const modalBody = $('modalBody');
   const modalClose = $('modalClose');
+  const orderDetailModal = $('orderDetailModal');
+  const orderDetailTitle = $('orderDetailTitle');
+  const orderDetailBody = $('orderDetailBody');
+  const orderDetailTotal = $('orderDetailTotal');
+  const orderDetailServe = $('orderDetailServe');
+  const orderDetailClose = $('orderDetailClose');
+  const remarkModal = $('remarkModal');
+  const remarkTitle = $('remarkTitle');
+  const remarkBody = $('remarkBody');
+  const remarkClose = $('remarkClose');
+  const remarkConfirm = $('remarkConfirm');
   const toast = $('toast');
 
   let toastTimer = null;
+  let remarkTargetDish = null; // 当前要加备注的菜品
+  let remarkSelection = {};    // { 组标题: [已选项] }
+  let currentDetailOrderId = null; // 当前详情弹窗的订单 id
 
   /* ============ 登录 ============ */
   function showLogin() {
@@ -528,6 +953,12 @@
   });
 
   /* ============ 分类渲染 ============ */
+  function countDishes(cat) {
+    if (cat.items) return cat.items.length;
+    if (cat.groups) return cat.groups.reduce((s, g) => s + g.items.length, 0);
+    return 0;
+  }
+
   function renderCategories() {
     categoryArea.innerHTML = '';
     MENU.forEach((cat) => {
@@ -535,30 +966,53 @@
       btn.className = 'category-card';
       btn.innerHTML =
         '<span class="cat-name">' + cat.icon + ' ' + cat.category + '</span>' +
-        '<span class="cat-sub">点击查看菜品并加入订单</span>' +
-        '<span class="cat-count">共 ' + cat.items.length + ' 道菜</span>';
+        '<span class="cat-sub">点击查看菜品并加入待确定</span>' +
+        '<span class="cat-count">共 ' + countDishes(cat) + ' 道菜</span>';
       btn.addEventListener('click', () => openDishModal(cat));
       categoryArea.appendChild(btn);
     });
   }
 
   /* ============ 菜品弹窗 ============ */
+  function buildDishItem(dish, remarkGroups) {
+    const item = document.createElement('div');
+    item.className = 'dish-item';
+    item.innerHTML =
+      '<div class="dish-info">' +
+        '<div class="di-name">' + dish.name + '</div>' +
+        (dish.desc ? '<div class="di-desc">' + dish.desc + '</div>' : '') +
+        '<div class="di-price">¥' + dish.price.toFixed(2) + '</div>' +
+      '</div>' +
+      '<button class="add-btn">＋ 加入</button>';
+    item.querySelector('.add-btn').addEventListener('click', () => {
+      if (remarkGroups && remarkGroups.length) {
+        openRemarkModal(dish, remarkGroups);
+      } else {
+        addToPending(dish, []);
+      }
+    });
+    return item;
+  }
+
   function openDishModal(cat) {
     modalTitle.textContent = cat.icon + ' ' + cat.category;
     modalBody.innerHTML = '';
-    cat.items.forEach((dish) => {
-      const item = document.createElement('div');
-      item.className = 'dish-item';
-      item.innerHTML =
-        '<div class="dish-info">' +
-          '<div class="di-name">' + dish.name + '</div>' +
-          '<div class="di-desc">' + (dish.desc || '') + '</div>' +
-          '<div class="di-price">¥' + dish.price.toFixed(2) + '</div>' +
-        '</div>' +
-        '<button class="add-btn">＋ 加入</button>';
-      item.querySelector('.add-btn').addEventListener('click', () => addOrder(dish));
-      modalBody.appendChild(item);
-    });
+    if (cat.groups && cat.groups.length) {
+      // 饮品：按子系列分组展示
+      cat.groups.forEach((g) => {
+        const head = document.createElement('div');
+        head.className = 'group-head';
+        head.textContent = g.name;
+        modalBody.appendChild(head);
+        g.items.forEach((dish) => {
+          modalBody.appendChild(buildDishItem(dish, cat.remarkGroups));
+        });
+      });
+    } else if (cat.items) {
+      cat.items.forEach((dish) => {
+        modalBody.appendChild(buildDishItem(dish, cat.remarkGroups));
+      });
+    }
     dishModal.classList.remove('hidden');
   }
 
@@ -569,6 +1023,212 @@
   dishModal.addEventListener('click', (e) => {
     if (e.target === dishModal) closeDishModal();
   });
+
+  /* ============ 备注选择弹窗 ============ */
+  function openRemarkModal(dish, remarkGroups) {
+    remarkTargetDish = dish;
+    remarkSelection = {};
+    remarkTitle.textContent = dish.name;
+    remarkBody.innerHTML = '';
+    remarkGroups.forEach((g) => {
+      const grp = document.createElement('div');
+      grp.className = 'remark-group';
+      const gt = document.createElement('div');
+      gt.className = 'remark-group-title';
+      gt.textContent = g.title;
+      grp.appendChild(gt);
+      const chips = document.createElement('div');
+      chips.className = 'remark-chips';
+      g.options.forEach((opt) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'chip';
+        chip.textContent = opt;
+        chip.addEventListener('click', () => {
+          if (g.single) {
+            remarkSelection[g.title] = [opt];
+          } else {
+            if (!remarkSelection[g.title]) remarkSelection[g.title] = [];
+            const arr = remarkSelection[g.title];
+            const i = arr.indexOf(opt);
+            if (i >= 0) arr.splice(i, 1); else arr.push(opt);
+          }
+          syncChipStates(chips, remarkSelection[g.title] || []);
+        });
+        chips.appendChild(chip);
+      });
+      grp.appendChild(chips);
+      remarkBody.appendChild(grp);
+    });
+    remarkModal.classList.remove('hidden');
+  }
+
+  function syncChipStates(chipsEl, selected) {
+    chipsEl.querySelectorAll('.chip').forEach((b) => {
+      b.classList.toggle('active', selected.indexOf(b.textContent) >= 0);
+    });
+  }
+
+  function closeRemarkModal() {
+    remarkModal.classList.add('hidden');
+    remarkTargetDish = null;
+    remarkSelection = {};
+  }
+  remarkClose.addEventListener('click', closeRemarkModal);
+  remarkModal.addEventListener('click', (e) => {
+    if (e.target === remarkModal) closeRemarkModal();
+  });
+  remarkConfirm.addEventListener('click', () => {
+    if (!remarkTargetDish) return;
+    const remarks = [];
+    Object.keys(remarkSelection).forEach((k) => {
+      remarkSelection[k].forEach((r) => remarks.push(r));
+    });
+    addToPending(remarkTargetDish, remarks);
+    closeRemarkModal();
+  });
+
+  /* ============ 订单详情弹窗 ============ */
+  function renderOrderDetail(o) {
+    orderDetailTitle.textContent = '订单 #' + o.seq + ' · ' + formatTime(o.time);
+    orderDetailTotal.textContent = '共 ' + o.dishes.length + ' 件 ¥' + o.total.toFixed(2);
+    orderDetailBody.innerHTML = '';
+    o.dishes.forEach((d, idx) => {
+      const row = document.createElement('div');
+      row.className = 'detail-dish';
+      row.innerHTML =
+        '<div class="dd-left">' +
+          '<span class="dd-name">' + d.name + '</span>' +
+          (d.remarks && d.remarks.length ? '<span class="dd-remark">' + d.remarks.join('，') + '</span>' : '') +
+        '</div>' +
+        '<div class="dd-right">' +
+          '<span class="dd-price">¥' + d.price.toFixed(2) + '</span>' +
+          '<button class="dd-serve">出餐</button>' +
+        '</div>';
+      row.querySelector('.dd-serve').addEventListener('click', () => serveDish(o.id, idx));
+      orderDetailBody.appendChild(row);
+    });
+  }
+
+  function openOrderDetail(o) {
+    currentDetailOrderId = o.id;
+    renderOrderDetail(o);
+    orderDetailModal.classList.remove('hidden');
+  }
+
+  function closeOrderDetail() {
+    orderDetailModal.classList.add('hidden');
+    currentDetailOrderId = null;
+  }
+  orderDetailClose.addEventListener('click', closeOrderDetail);
+  orderDetailModal.addEventListener('click', (e) => {
+    if (e.target === orderDetailModal) closeOrderDetail();
+  });
+  orderDetailServe.addEventListener('click', () => {
+    if (currentDetailOrderId) serveOrder(currentDetailOrderId);
+    closeOrderDetail();
+  });
+
+  // 单菜出餐：移除订单里的某一道菜
+  function serveDish(orderId, dishIndex) {
+    const o = orders.find((x) => x.id === orderId);
+    if (!o) return;
+    const dish = o.dishes[dishIndex];
+    if (!dish) return;
+    o.dishes.splice(dishIndex, 1);
+    if (o.dishes.length === 0) {
+      // 整单菜品都出完：删除订单并释放单号
+      const oi = orders.indexOf(o);
+      orders.splice(oi, 1);
+      nextSeq = o.seq;
+      saveAll();
+      renderOrders();
+      closeOrderDetail();
+      showToast('已出餐 #' + o.seq);
+    } else {
+      o.total = o.dishes.reduce((s, d) => s + d.price, 0);
+      saveAll();
+      renderOrders();
+      renderOrderDetail(o);
+      showToast('已出餐：' + dish.name);
+    }
+  }
+
+  /* ============ 待确定订单 ============ */
+  function addToPending(dish, remarks) {
+    pending.push({
+      id: Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+      name: dish.name,
+      price: dish.price,
+      remarks: remarks || [],
+    });
+    savePending();
+    renderPending();
+    showToast('已加入待确定：' + dish.name);
+  }
+
+  function removePending(id) {
+    pending = pending.filter((p) => p.id !== id);
+    savePending();
+    renderPending();
+  }
+
+  pendingClear.addEventListener('click', () => {
+    pending = [];
+    savePending();
+    renderPending();
+    showToast('已清空待确定');
+  });
+
+  function renderPending() {
+    if (pending.length === 0) {
+      pendingPanel.classList.add('hidden');
+      pendingList.innerHTML = '';
+      return;
+    }
+    pendingPanel.classList.remove('hidden');
+    const total = pending.reduce((s, p) => s + p.price, 0);
+    confirmBtn.textContent = '确定下单（' + pending.length + ' 件 ¥' + total.toFixed(2) + '）';
+    pendingList.innerHTML = '';
+    pending.forEach((p) => {
+      const el = document.createElement('div');
+      el.className = 'pending-item';
+      el.innerHTML =
+        '<button class="pi-remove">×</button>' +
+        '<div class="pi-name">' + p.name + '</div>' +
+        (p.remarks && p.remarks.length ? '<div class="pi-remark">' + p.remarks.join('，') + '</div>' : '') +
+        '<div class="pi-price">¥' + p.price.toFixed(2) + '</div>';
+      el.querySelector('.pi-remove').addEventListener('click', () => removePending(p.id));
+      pendingList.appendChild(el);
+    });
+  }
+
+  /* ============ 确定下单 ============ */
+  confirmBtn.addEventListener('click', confirmOrder);
+
+  function confirmOrder() {
+    if (pending.length === 0) {
+      showToast('请先选择菜品');
+      return;
+    }
+    const total = pending.reduce((s, p) => s + p.price, 0);
+    const seq = nextSeq;
+    orders.push({
+      id: Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+      seq: seq,
+      dishes: pending.map((p) => ({ name: p.name, price: p.price, remarks: p.remarks || [] })),
+      time: Date.now(),
+      total: total,
+    });
+    nextSeq += 1;
+    // 最新下单的排最底下
+    orders.sort((a, b) => a.time - b.time);
+    pending = [];
+    saveAll();
+    renderPending();
+    renderOrders();
+    showToast('已下单 #' + seq);
+  }
 
   /* ============ 订单列表展开/收起 ============ */
   function expandOrders() {
@@ -592,57 +1252,17 @@
   collapseBtn.addEventListener('click', collapseOrders);
   orderMask.addEventListener('click', collapseOrders);
 
-  /* ============ 订单 ============ */
-  function loadOrders() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      orders = raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      orders = [];
-    }
-    if (!Array.isArray(orders)) orders = [];
-    // 按时间升序：最新的排最底下
-    orders.sort((a, b) => a.time - b.time);
-    // 恢复订单号计数器（取已存订单号与本地计数器的最大值）
-    seqCounter = 0;
-    try {
-      seqCounter = parseInt(localStorage.getItem(SEQ_KEY), 10) || 0;
-    } catch (e) { seqCounter = 0; }
-    orders.forEach((o) => {
-      if (typeof o.seq === 'number' && o.seq > seqCounter) seqCounter = o.seq;
-    });
-  }
-
-  function saveOrders() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-    } catch (e) { /* 存储失败时忽略 */ }
-  }
-
-  function addOrder(dish) {
-    seqCounter += 1;
-    orders.push({
-      id: Date.now() + '-' + Math.random().toString(36).slice(2, 8),
-      seq: seqCounter,
-      name: dish.name,
-      price: dish.price,
-      time: Date.now(),
-    });
-    // 最新下单的排最底下
-    orders.sort((a, b) => a.time - b.time);
-    saveOrders();
-    try {
-      localStorage.setItem(SEQ_KEY, String(seqCounter));
-    } catch (e) { /* 忽略 */ }
+  /* ============ 出餐 ============ */
+  function serveOrder(id) {
+    const idx = orders.findIndex((o) => o.id === id);
+    if (idx === -1) return;
+    const served = orders[idx];
+    // 下一个订单号复用刚出餐这单的订单号
+    nextSeq = served.seq;
+    orders.splice(idx, 1);
+    saveAll();
     renderOrders();
-    showToast('已加入：' + dish.name);
-  }
-
-  function removeOrder(id) {
-    orders = orders.filter((o) => o.id !== id);
-    saveOrders();
-    renderOrders();
-    showToast('已出餐 ✓');
+    showToast('已出餐 #' + served.seq);
   }
 
   function formatTime(ts) {
@@ -659,23 +1279,77 @@
       return;
     }
     orderList.innerHTML = '';
+    const MAX_PREVIEW = 3; // 每单卡片最多预览几道菜
     orders.forEach((o) => {
+      const preview = o.dishes.slice(0, MAX_PREVIEW);
+      const moreCount = o.dishes.length - preview.length;
+      let dishHtml = '';
+      preview.forEach((d) => {
+        dishHtml += '<div class="oi-dish">' +
+          '<div class="oi-dish-name">' + d.name + '</div>' +
+          (d.remarks && d.remarks.length ? '<div class="oi-remark">' + d.remarks.join('，') + '</div>' : '') +
+        '</div>';
+      });
+      if (moreCount > 0) {
+        dishHtml += '<div class="oi-more">+' + moreCount + ' 更多</div>';
+      }
       const item = document.createElement('div');
       item.className = 'order-item';
       item.innerHTML =
-        '<div class="order-info">' +
-          '<div class="oi-seq">#' + o.seq + '</div>' +
-          '<div class="oi-name">' + o.name + '</div>' +
-          '<div class="oi-meta">下单 ' + formatTime(o.time) + '</div>' +
-          '<div class="oi-price">¥' + o.price.toFixed(2) + '</div>' +
+        '<div class="oi-top">' +
+          '<span class="oi-seq">#' + o.seq + '</span>' +
+          '<span class="oi-time">' + formatTime(o.time) + '</span>' +
         '</div>' +
-        '<button class="serve-btn">出餐</button>';
+        '<div class="oi-dish-list">' + dishHtml + '</div>' +
+        '<div class="oi-foot">' +
+          '<span class="oi-total">¥' + o.total.toFixed(2) + '</span>' +
+          '<button class="serve-btn">出餐</button>' +
+        '</div>';
+      item.addEventListener('click', () => openOrderDetail(o));
       item.querySelector('.serve-btn').addEventListener('click', (e) => {
         e.stopPropagation();
-        removeOrder(o.id);
+        serveOrder(o.id);
       });
       orderList.appendChild(item);
     });
+  }
+
+  /* ============ 本地存储 ============ */
+  function loadState() {
+    try {
+      orders = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    } catch (e) { orders = []; }
+    if (!Array.isArray(orders)) orders = [];
+    orders.sort((a, b) => a.time - b.time);
+
+    try {
+      pending = JSON.parse(localStorage.getItem(PENDING_KEY)) || [];
+    } catch (e) { pending = []; }
+    if (!Array.isArray(pending)) pending = [];
+
+    nextSeq = 1;
+    try {
+      const n = parseInt(localStorage.getItem(SEQ_KEY), 10);
+      if (!isNaN(n) && n >= 1) nextSeq = n;
+    } catch (e) { nextSeq = 1; }
+    // 兜底：确保 nextSeq 不与现存订单号冲突
+    orders.forEach((o) => {
+      if (typeof o.seq === 'number' && o.seq >= nextSeq) nextSeq = o.seq + 1;
+    });
+  }
+
+  function savePending() {
+    try {
+      localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+    } catch (e) { /* 忽略 */ }
+  }
+
+  function saveAll() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+      localStorage.setItem(SEQ_KEY, String(nextSeq));
+      localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+    } catch (e) { /* 忽略 */ }
   }
 
   /* ============ 轻提示 ============ */
@@ -688,7 +1362,8 @@
 
   /* ============ 初始化 ============ */
   renderCategories();
-  loadOrders();
+  loadState();
+  renderPending();
   renderOrders();
   showLogin();
 })();
