@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="theme-color" content="#10b981" />
+<title>下单员点单系统</title>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --card: #ffffff;
+    --primary: #10b981;
+    --primary-dark: #0d9d6e;
+    --danger: #ef4444;
+    --text: #1f2937;
+    --text-2: #6b7280;
+    --text-3: #9ca3af;
+    --line: #eceef1;
+    --radius: 16px;
+    --shadow: 0 6px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    touch-action: manipulation;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; }
+  input { font-family: inherit; }
+
+  .hidden { display: none !important; }
+
+  /* ============ 登录页 ============ */
+  #loginView {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: linear-gradient(160deg, #10b981 0%, #0ea5e9 100%);
+  }
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--card);
+    border-radius: 24px;
+    padding: 36px 28px 30px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+  }
+  .login-title { font-size: 24px; font-weight: 700; text-align: center; }
+  .login-sub { font-size: 14px; color: var(--text-2); text-align: center; margin: 8px 0 28px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; color: var(--text-2); margin-bottom: 6px; }
+  .form-group input {
+    width: 100%;
+    height: 50px;
+    padding: 0 16px;
+    font-size: 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    outline: none;
+    background: #fafbfc;
+    transition: border-color .15s;
+  }
+  .form-group input:focus { border-color: var(--primary); background: #fff; }
+  .login-error {
+    color: var(--danger);
+    font-size: 13px;
+    text-align: center;
+    margin: -4px 0 12px;
+    min-height: 18px;
+  }
+  .login-btn {
+    width: 100%;
+    height: 50px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: background .15s, transform .05s;
+  }
+  .login-btn:active { background: var(--primary-dark); transform: scale(.98); }
+
+  /* ============ 主界面 ============ */
+  #mainView {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .topbar {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar h1 { font-size: 18px; font-weight: 700; }
+  .topbar .logout {
+    font-size: 13px;
+    color: var(--text-2);
+    background: #f1f2f4;
+    padding: 8px 14px;
+    border-radius: 10px;
+  }
+  .topbar .logout:active { background: #e5e7eb; }
+
+  .category-area {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 16px;
+    overflow-y: auto;
+  }
+  .category-card {
+    flex: 1 1 0;
+    min-height: 96px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    background: var(--card);
+    box-shadow: var(--shadow);
+    text-align: left;
+    transition: transform .06s;
+  }
+  .category-card:active { transform: scale(.98); }
+  .category-card .cat-name { font-size: 20px; font-weight: 700; }
+  .category-card .cat-sub { font-size: 13px; color: var(--text-2); margin-top: 6px; }
+  .category-card .cat-count {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--primary);
+    background: rgba(16, 185, 129, .12);
+    padding: 3px 10px;
+    border-radius: 20px;
+    align-self: flex-start;
+  }
+
+  /* ============ 订单列表 ============ */
+  .order-panel {
+    flex-shrink: 0;
+    max-height: 40%;
+    display: flex;
+    flex-direction: column;
+    background: var(--card);
+    border-top: 1px solid var(--line);
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -6px 20px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+  }
+  .order-panel.expanded {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 80dvh;
+    max-height: none;
+    z-index: 90;
+    border-radius: 20px 20px 0 0;
+  }
+  .order-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    z-index: 89;
+  }
+  .collapse-btn {
+    flex-shrink: 0;
+    width: 100%;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: #f1f2f4;
+    color: var(--text-2);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .collapse-btn:active { background: #e5e7eb; }
+  .order-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 10px;
+  }
+  .order-head h2 { font-size: 16px; font-weight: 700; }
+  .order-head-right { display: flex; align-items: center; gap: 8px; }
+  .order-head .order-total { font-size: 13px; color: var(--text-2); }
+  .expand-hint { font-size: 14px; color: var(--text-3); transition: transform .2s; }
+  .order-list {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 0 14px 14px;
+    overflow-y: auto;
+    align-content: start;
+    -webkit-overflow-scrolling: touch;
+  }
+  .order-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-3);
+    font-size: 14px;
+    padding: 28px 0;
+  }
+  .order-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 10px;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+  }
+  .order-info { min-width: 0; }
+  .order-info .oi-seq {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    background: rgba(16, 185, 129, .12);
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+  }
+  .order-info .oi-name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    word-break: break-all;
+  }
+  .order-info .oi-meta { font-size: 11px; color: var(--text-3); margin-top: 3px; }
+  .order-info .oi-price { font-size: 15px; font-weight: 700; color: var(--primary); margin-top: 3px; }
+  .serve-btn {
+    width: 100%;
+    height: 36px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: background .15s, transform .05s;
+  }
+  .serve-btn:active { background: var(--primary-dark); transform: scale(.96); }
+
+  /* ============ 菜品弹窗 ============ */
+  .modal-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: flex;
+    align-items: flex-end;
+    z-index: 100;
+    animation: fadeIn .18s;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-sheet {
+    width: 100%;
+    max-height: 78dvh;
+    background: var(--card);
+    border-radius: 24px 24px 0 0;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp .22s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-head {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 12px;
+  }
+  .modal-head h3 { font-size: 18px; font-weight: 700; }
+  .modal-close {
+    width: 34px; height: 34px;
+    background: #f1f2f4;
+    color: var(--text-2);
+    font-size: 18px;
+    border-radius: 10px;
+  }
+  .modal-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 4px 16px 20px;
+    align-content: start;
+    -webkit-overflow-scrolling: touch;
+  }
+  .dish-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 8px;
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    text-align: center;
+  }
+  .dish-info { width: 100%; min-width: 0; }
+  .dish-info .di-name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+    word-break: break-all;
+  }
+  .dish-info .di-desc {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .dish-info .di-price { font-size: 14px; font-weight: 700; color: #f59e0b; margin-top: 4px; }
+  .add-btn {
+    width: 100%;
+    height: 36px;
+    background: rgba(16, 185, 129, .12);
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 20px;
+  }
+  .add-btn:active { background: rgba(16, 185, 129, .22); }
+
+  /* ============ 轻提示 ============ */
+  #toast {
+    position: fixed;
+    left: 50%;
+    bottom: 90px;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.85);
+    color: #fff;
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 24px;
+    z-index: 200;
+    pointer-events: none;
+    animation: fadeIn .18s;
+  }
+</style>
+</head>
+<body>
+
+  <!-- 登录视图 -->
+  <section id="loginView">
+    <div class="login-card">
+      <div class="login-title">下单员点单系统</div>
+      <div class="login-sub">请登录后开始点单</div>
+      <div class="form-group">
+        <label for="accountInput">账号</label>
+        <input id="accountInput" type="text" placeholder="你的名字缩写" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label for="passwordInput">密码</label>
+        <input id="passwordInput" type="password" placeholder="4 位数生日为密码" autocomplete="off" />
+      </div>
+      <div id="loginError" class="login-error"></div>
+      <button id="loginBtn" class="login-btn">登 录</button>
+    </div>
+  </section>
+
+  <!-- 主界面 -->
+  <section id="mainView" class="hidden">
+    <header class="topbar">
+      <h1>📋 点单台</h1>
+      <button id="logoutBtn" class="logout">退出登录</button>
+    </header>
+    <div id="categoryArea" class="category-area"></div>
+
+    <div id="orderMask" class="order-mask hidden"></div>
+    <div class="order-panel" id="orderPanel">
+      <button id="collapseBtn" class="collapse-btn hidden">▾ 收起</button>
+      <div class="order-head" id="orderHead">
+        <h2>订单列表</h2>
+        <div class="order-head-right">
+          <span id="orderTotal" class="order-total"></span>
+          <span id="expandHint" class="expand-hint">▲</span>
+        </div>
+      </div>
+      <div id="orderList" class="order-list"></div>
+    </div>
+  </section>
+
+  <!-- 菜品弹窗 -->
+  <div id="dishModal" class="modal-mask hidden">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <h3 id="modalTitle"></h3>
+        <button id="modalClose" class="modal-close">✕</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============ 配置区（可自行修改） ============ */
+  const ACCOUNT = 'hlj';
+  const PASSWORD = '0512';
+
+  // 菜品数据：category 为分类名，items 为该分类下的菜品
+  const MENU = [
+    {
+      category: '饮品',
+      icon: '🧋',
+      items: [
+        { name: '冰镇柠檬茶', price: 8,  desc: '清爽解腻' },
+        { name: '港式奶茶',   price: 12, desc: '香浓丝滑' },
+        { name: '鲜榨橙汁',   price: 15, desc: '现榨无添加' },
+        { name: '冰美式咖啡', price: 10, desc: '提神醒脑' },
+        { name: '青柠气泡水', price: 9,  desc: '酸甜气泡' },
+      ],
+    },
+    {
+      category: '锅炒',
+      icon: '🍳',
+      items: [
+        { name: '农家小炒肉', price: 28, desc: '香辣下饭' },
+        { name: '番茄炒蛋',   price: 18, desc: '家常经典' },
+        { name: '干煸四季豆', price: 20, desc: '干香爽脆' },
+        { name: '宫保鸡丁',   price: 26, desc: '酸甜微辣' },
+        { name: '蒜蓉空心菜', price: 16, desc: '清爽时蔬' },
+      ],
+    },
+    {
+      category: '汤粉',
+      icon: '🍜',
+      items: [
+        { name: '牛肉汤粉', price: 22, desc: '原汤炖牛肉' },
+        { name: '猪杂汤粉', price: 18, desc: '料足汤鲜' },
+        { name: '酸辣粉',   price: 14, desc: '酸辣开胃' },
+        { name: '海鲜汤粉', price: 25, desc: '鲜虾贝类' },
+        { name: '桂林米粉', price: 16, desc: '地道风味' },
+      ],
+    },
+  ];
+
+  const STORAGE_KEY = 'order_taker_orders';
+  const SEQ_KEY = 'order_taker_seq';
+
+  /* ============ 状态 ============ */
+  let orders = []; // { id, name, price, time }
+  let seqCounter = 0; // 订单号计数器
+
+  /* ============ DOM ============ */
+  const $ = (id) => document.getElementById(id);
+  const loginView = $('loginView');
+  const mainView = $('mainView');
+  const accountInput = $('accountInput');
+  const passwordInput = $('passwordInput');
+  const loginError = $('loginError');
+  const loginBtn = $('loginBtn');
+  const logoutBtn = $('logoutBtn');
+  const categoryArea = $('categoryArea');
+  const orderPanel = $('orderPanel');
+  const orderHead = $('orderHead');
+  const orderMask = $('orderMask');
+  const collapseBtn = $('collapseBtn');
+  const expandHint = $('expandHint');
+  const orderList = $('orderList');
+  const orderTotal = $('orderTotal');
+  const dishModal = $('dishModal');
+  const modalTitle = $('modalTitle');
+  const modalBody = $('modalBody');
+  const modalClose = $('modalClose');
+  const toast = $('toast');
+
+  let toastTimer = null;
+
+  /* ============ 登录 ============ */
+  function showLogin() {
+    mainView.classList.add('hidden');
+    loginView.classList.remove('hidden');
+  }
+
+  function showMain() {
+    loginView.classList.add('hidden');
+    mainView.classList.remove('hidden');
+  }
+
+  loginBtn.addEventListener('click', doLogin);
+  passwordInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  function doLogin() {
+    const acc = accountInput.value.trim();
+    const pwd = passwordInput.value;
+    if (acc === ACCOUNT && pwd === PASSWORD) {
+      loginError.textContent = '';
+      showMain();
+    } else {
+      loginError.textContent = '账号或密码错误，请重试';
+      passwordInput.value = '';
+      passwordInput.focus();
+    }
+  }
+
+  logoutBtn.addEventListener('click', () => {
+    accountInput.value = '';
+    passwordInput.value = '';
+    loginError.textContent = '';
+    collapseOrders();
+    showLogin();
+  });
+
+  /* ============ 分类渲染 ============ */
+  function renderCategories() {
+    categoryArea.innerHTML = '';
+    MENU.forEach((cat) => {
+      const btn = document.createElement('button');
+      btn.className = 'category-card';
+      btn.innerHTML =
+        '<span class="cat-name">' + cat.icon + ' ' + cat.category + '</span>' +
+        '<span class="cat-sub">点击查看菜品并加入订单</span>' +
+        '<span class="cat-count">共 ' + cat.items.length + ' 道菜</span>';
+      btn.addEventListener('click', () => openDishModal(cat));
+      categoryArea.appendChild(btn);
+    });
+  }
+
+  /* ============ 菜品弹窗 ============ */
+  function openDishModal(cat) {
+    modalTitle.textContent = cat.icon + ' ' + cat.category;
+    modalBody.innerHTML = '';
+    cat.items.forEach((dish) => {
+      const item = document.createElement('div');
+      item.className = 'dish-item';
+      item.innerHTML =
+        '<div class="dish-info">' +
+          '<div class="di-name">' + dish.name + '</div>' +
+          '<div class="di-desc">' + (dish.desc || '') + '</div>' +
+          '<div class="di-price">¥' + dish.price.toFixed(2) + '</div>' +
+        '</div>' +
+        '<button class="add-btn">＋ 加入</button>';
+      item.querySelector('.add-btn').addEventListener('click', () => addOrder(dish));
+      modalBody.appendChild(item);
+    });
+    dishModal.classList.remove('hidden');
+  }
+
+  function closeDishModal() {
+    dishModal.classList.add('hidden');
+  }
+  modalClose.addEventListener('click', closeDishModal);
+  dishModal.addEventListener('click', (e) => {
+    if (e.target === dishModal) closeDishModal();
+  });
+
+  /* ============ 订单列表展开/收起 ============ */
+  function expandOrders() {
+    orderPanel.classList.add('expanded');
+    orderMask.classList.remove('hidden');
+    collapseBtn.classList.remove('hidden');
+    expandHint.classList.add('hidden');
+  }
+
+  function collapseOrders() {
+    orderPanel.classList.remove('expanded');
+    orderMask.classList.add('hidden');
+    collapseBtn.classList.add('hidden');
+    expandHint.classList.remove('hidden');
+  }
+
+  orderHead.addEventListener('click', () => {
+    if (orderPanel.classList.contains('expanded')) collapseOrders();
+    else expandOrders();
+  });
+  collapseBtn.addEventListener('click', collapseOrders);
+  orderMask.addEventListener('click', collapseOrders);
+
+  /* ============ 订单 ============ */
+  function loadOrders() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      orders = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      orders = [];
+    }
+    if (!Array.isArray(orders)) orders = [];
+    // 按时间升序：最新的排最底下
+    orders.sort((a, b) => a.time - b.time);
+    // 恢复订单号计数器（取已存订单号与本地计数器的最大值）
+    seqCounter = 0;
+    try {
+      seqCounter = parseInt(localStorage.getItem(SEQ_KEY), 10) || 0;
+    } catch (e) { seqCounter = 0; }
+    orders.forEach((o) => {
+      if (typeof o.seq === 'number' && o.seq > seqCounter) seqCounter = o.seq;
+    });
+  }
+
+  function saveOrders() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+    } catch (e) { /* 存储失败时忽略 */ }
+  }
+
+  function addOrder(dish) {
+    seqCounter += 1;
+    orders.push({
+      id: Date.now() + '-' + Math.random().toString(36).slice(2, 8),
+      seq: seqCounter,
+      name: dish.name,
+      price: dish.price,
+      time: Date.now(),
+    });
+    // 最新下单的排最底下
+    orders.sort((a, b) => a.time - b.time);
+    saveOrders();
+    try {
+      localStorage.setItem(SEQ_KEY, String(seqCounter));
+    } catch (e) { /* 忽略 */ }
+    renderOrders();
+    showToast('已加入：' + dish.name);
+  }
+
+  function removeOrder(id) {
+    orders = orders.filter((o) => o.id !== id);
+    saveOrders();
+    renderOrders();
+    showToast('已出餐 ✓');
+  }
+
+  function formatTime(ts) {
+    const d = new Date(ts);
+    const p = (n) => String(n).padStart(2, '0');
+    return p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  function renderOrders() {
+    const count = orders.length;
+    orderTotal.textContent = count > 0 ? '共 ' + count + ' 单' : '';
+    if (count === 0) {
+      orderList.innerHTML = '<div class="order-empty">暂无订单，去点几道菜吧～</div>';
+      return;
+    }
+    orderList.innerHTML = '';
+    orders.forEach((o) => {
+      const item = document.createElement('div');
+      item.className = 'order-item';
+      item.innerHTML =
+        '<div class="order-info">' +
+          '<div class="oi-seq">#' + o.seq + '</div>' +
+          '<div class="oi-name">' + o.name + '</div>' +
+          '<div class="oi-meta">下单 ' + formatTime(o.time) + '</div>' +
+          '<div class="oi-price">¥' + o.price.toFixed(2) + '</div>' +
+        '</div>' +
+        '<button class="serve-btn">出餐</button>';
+      item.querySelector('.serve-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeOrder(o.id);
+      });
+      orderList.appendChild(item);
+    });
+  }
+
+  /* ============ 轻提示 ============ */
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.add('hidden'), 1200);
+  }
+
+  /* ============ 初始化 ============ */
+  renderCategories();
+  loadOrders();
+  renderOrders();
+  showLogin();
+})();
+</script>
+</body>
+</html>
